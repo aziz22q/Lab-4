@@ -1,3 +1,4 @@
+import lejos.nxt.LCD;
 import lejos.nxt.LightSensor;
 import lejos.nxt.Motor;
 import lejos.nxt.NXTRegulatedMotor;
@@ -9,9 +10,9 @@ import lejos.robotics.subsumption.Behavior;
 
 public class Robot {
 
-	final static int DISTANCE = 20;
-	final static int TURN = 2;
-	final static int SPEED = 200;
+	final static int DISTANCE = 200;
+	//final static int TURN = 2;
+	final static int SPEED = 100;
 
 	static NXTRegulatedMotor leftMotor = Motor.C;
 	static NXTRegulatedMotor rightMotor = Motor.A;
@@ -19,19 +20,22 @@ public class Robot {
 	static DifferentialPilot robot = new DifferentialPilot(5.6f, 11.0f, Motor.A, Motor.C, true);
 	
 	static TouchSensor tSensor = new TouchSensor(SensorPort.S1);
-	static LightSensor lSensor = new LightSensor(SensorPort.S2);
+	static LightSensor lSensor = new LightSensor(SensorPort.S3);
+	
+	// SensorPort.S1.SensorPortListener(tSensor);
 
 	static boolean stop = false;
 
 	public static void main(String args[]) {
 		
 		setSpeed(SPEED);
-		
+		//LCD.drawInt(lSensor.readValue(), 0, 0);
 		Behavior move = new Wonder();
 		Behavior avoid = new Avoid(robot, tSensor);
 		Behavior feed = new Feed(lSensor);
 
-		Behavior behaviors[] = { move, avoid, feed };
+		//Behavior behaviors[] = { move, avoid, feed };
+		Behavior behaviors[] = {move, avoid, feed};
 
 		Arbitrator arbitrator = new Arbitrator(behaviors);
 		arbitrator.start();
@@ -59,7 +63,8 @@ public class Robot {
 		
 		stop = false;
 
-		int degrees = angle * TURN;
+		//int degrees = angle * TURN;
+		int degrees = angle;
 
 		NXTRegulatedMotor forwardMotor = leftMotor;
 		NXTRegulatedMotor backwardMotor = rightMotor;
@@ -91,6 +96,8 @@ public class Robot {
 
 		forwardMotor.stop();
 		backwardMotor.stop();
+		forwardMotor.resetTachoCount();
+		backwardMotor.resetTachoCount();
 	}
 
 	/*
@@ -98,6 +105,8 @@ public class Robot {
 	 */
 	public static void move(int distance) throws Exception {
 		
+		//LCD.drawInt(lSensor.readNormalizedValue(), 0, 0);
+		LCD.drawInt(lSensor.readValue(), 0, 0);
 		stop = false;
 		int degrees = DISTANCE;
 
@@ -132,6 +141,30 @@ public class Robot {
 
 		leftMotor.stop();
 		rightMotor.stop();
-	}
+	
+	/*	
+		int numDegrees = distance;
+		leftMotor.setSpeed(SPEED); 
+		leftMotor.resetTachoCount();
+		rightMotor.setSpeed(SPEED); 
+		rightMotor.resetTachoCount();
 
+		leftMotor.forward(); 
+		rightMotor.forward();
+
+		while ((leftMotor.getTachoCount() <= numDegrees) || (rightMotor.getTachoCount() <= numDegrees)) {
+			if (leftMotor.getTachoCount() > numDegrees) {
+			
+				leftMotor.stop(); 
+
+			if (rightMotor.getTachoCount() > numDegrees) {
+				// if right is
+				rightMotor.stop(); 
+			}
+
+		}
+		rightMotor.stop(); 
+		leftMotor.stop(); 
+		*/
+	}
 }

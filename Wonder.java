@@ -1,3 +1,7 @@
+
+
+import java.util.Random;
+
 import lejos.robotics.subsumption.*;
 
 
@@ -17,8 +21,15 @@ public class Wonder implements Behavior {
 		{
 			while (!stop)
 			{
-				Robot.move(150);
-				Robot.turn(90);
+				Robot.move(200);
+				
+				Random rand = new Random(); 
+				 
+				int number = rand.nextInt(10) + 1;
+				
+				 if(number==7){
+					 Robot.turn(90);
+				 }
 			}
 		}
 		catch(Exception ex)
@@ -30,7 +41,7 @@ public class Wonder implements Behavior {
 
 	public void suppress() {
 		stop = true;
-		Robot.stop();
+		//Robot.stop();
 		
 	}
 
