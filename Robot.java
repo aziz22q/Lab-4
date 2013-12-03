@@ -1,4 +1,3 @@
-import lejos.nxt.LCD;
 import lejos.nxt.LightSensor;
 import lejos.nxt.Motor;
 import lejos.nxt.NXTRegulatedMotor;
@@ -8,34 +7,34 @@ import lejos.robotics.navigation.DifferentialPilot;
 import lejos.robotics.subsumption.Arbitrator;
 import lejos.robotics.subsumption.Behavior;
 
+/*
+ * This is the arbitrator class. 
+ */
 public class Robot {
 
 	final static int DISTANCE = 200;
-	//final static int TURN = 2;
-	final static int SPEED = 100;
+	final static int SPEED = 200;
 
 	static NXTRegulatedMotor leftMotor = Motor.C;
 	static NXTRegulatedMotor rightMotor = Motor.A;
 
-	static DifferentialPilot robot = new DifferentialPilot(5.6f, 11.0f, Motor.A, Motor.C, true);
-	
+	static DifferentialPilot robot = new DifferentialPilot(5.6f, 11.0f,
+			Motor.A, Motor.C, true);
+
 	static TouchSensor tSensor = new TouchSensor(SensorPort.S1);
 	static LightSensor lSensor = new LightSensor(SensorPort.S3);
-	
-	// SensorPort.S1.SensorPortListener(tSensor);
 
 	static boolean stop = false;
 
 	public static void main(String args[]) {
-		
+
 		setSpeed(SPEED);
-		//LCD.drawInt(lSensor.readValue(), 0, 0);
-		Behavior move = new Wonder();
+
+		Behavior wonder = new Wonder();
 		Behavior avoid = new Avoid(robot, tSensor);
 		Behavior feed = new Feed(lSensor);
 
-		//Behavior behaviors[] = { move, avoid, feed };
-		Behavior behaviors[] = {move, avoid, feed};
+		Behavior behaviors[] = { wonder, avoid, feed };
 
 		Arbitrator arbitrator = new Arbitrator(behaviors);
 		arbitrator.start();
@@ -60,10 +59,8 @@ public class Robot {
 	 * Turns
 	 */
 	public static void turn(int angle) throws Exception {
-		
-		stop = false;
 
-		//int degrees = angle * TURN;
+		stop = false;
 		int degrees = angle;
 
 		NXTRegulatedMotor forwardMotor = leftMotor;
@@ -80,91 +77,58 @@ public class Robot {
 		forwardMotor.forward();
 		backwardMotor.backward();
 
-		while (((forwardMotor.getTachoCount() < degrees) || (backwardMotor.getTachoCount() > -degrees)) && (!stop)) {
-	
-			if (forwardMotor.getTachoCount() > degrees)
-			{
+		while (((forwardMotor.getTachoCount() < degrees) || (backwardMotor
+				.getTachoCount() > -degrees)) && (!stop)) {
+
+			if (forwardMotor.getTachoCount() > degrees) {
 				forwardMotor.stop();
 			}
-			
-			if (backwardMotor.getTachoCount() < -degrees)
-			{
+
+			if (backwardMotor.getTachoCount() < -degrees) {
 				backwardMotor.stop();
 			}
-			
+			// Thread.yield();
+			// Thread.sleep(50);
 		}
 
 		forwardMotor.stop();
 		backwardMotor.stop();
-		forwardMotor.resetTachoCount();
-		backwardMotor.resetTachoCount();
+
 	}
 
 	/*
 	 * Move forward or backward
 	 */
 	public static void move(int distance) throws Exception {
-		
-		//LCD.drawInt(lSensor.readNormalizedValue(), 0, 0);
-		LCD.drawInt(lSensor.readValue(), 0, 0);
+
 		stop = false;
-		int degrees = DISTANCE;
+		int degrees = distance;
 
 		leftMotor.resetTachoCount();
 		rightMotor.resetTachoCount();
 
 		if (distance > 0) {
-			
+
 			leftMotor.forward();
 			rightMotor.forward();
-		
+
 		} else {
-		
+
 			leftMotor.backward();
 			rightMotor.backward();
-		
+
 		}
 
-		while ((leftMotor.getTachoCount() < degrees) || (rightMotor.getTachoCount() < degrees) && (!stop)) {
-			
-			if (leftMotor.getTachoCount() > degrees) {
+		while ((leftMotor.getTachoCount() < degrees)
+				|| (rightMotor.getTachoCount() < degrees) && (!stop)) {
 
-				leftMotor.stop(); 
-			}
+			// Thread.yield();
+			// Thread.sleep(50);
 
-			if (rightMotor.getTachoCount() > degrees) {
-
-				rightMotor.stop();
-			}
-	
 		}
 
 		leftMotor.stop();
 		rightMotor.stop();
-	
-	/*	
-		int numDegrees = distance;
-		leftMotor.setSpeed(SPEED); 
-		leftMotor.resetTachoCount();
-		rightMotor.setSpeed(SPEED); 
-		rightMotor.resetTachoCount();
 
-		leftMotor.forward(); 
-		rightMotor.forward();
-
-		while ((leftMotor.getTachoCount() <= numDegrees) || (rightMotor.getTachoCount() <= numDegrees)) {
-			if (leftMotor.getTachoCount() > numDegrees) {
-			
-				leftMotor.stop(); 
-
-			if (rightMotor.getTachoCount() > numDegrees) {
-				// if right is
-				rightMotor.stop(); 
-			}
-
-		}
-		rightMotor.stop(); 
-		leftMotor.stop(); 
-		*/
 	}
 }

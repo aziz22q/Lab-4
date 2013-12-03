@@ -1,74 +1,53 @@
-import lejos.nxt.SensorPort;
-import lejos.nxt.SensorPortListener;
 import lejos.nxt.TouchSensor;
 import lejos.robotics.navigation.DifferentialPilot;
 import lejos.robotics.subsumption.Behavior;
 
-
-public class Avoid implements Behavior, SensorPortListener{
+/*
+ * Uses the bump sensor. If the robot has bumped into something 
+ * it makes it move back and turn
+ */
+public class Avoid implements Behavior {
 	
+	//the robot
 	DifferentialPilot robot;
+	//the bump sensor
 	TouchSensor bump;
-	boolean stop;
-	boolean state;
-	
-	public Avoid(DifferentialPilot robot, TouchSensor bump)
-	{
+
+	//constructor
+	public Avoid(DifferentialPilot robot, TouchSensor bump) {
 		this.robot = robot;
 		this.bump = bump;
-		stop = false;
-		
-		//TouchSensor.addSensorListener(this);
+
 	}
 
+	//will take action only when the bump button 
+	//is pressed
 	public boolean takeControl() {
-		
-		state = bump.isPressed();
-		return state;
-		
+
+		return bump.isPressed();
+
 	}
 
-
+	//avoids the obstacle
 	public void action() {
-		stop = false;
-		try
-		{
-			if (!stop)
-			{
-				//Robot.move(-50);
-				//Robot.move(10);
-				Robot.turn(180);
-				stop = true;
-			}
-			
+
+		try {
+			//moves back
+			Robot.move(-30);
+			//turns
+			Robot.turn(180);
+
+			Thread.yield();
+			Thread.sleep(50);
+
+		} catch (Exception ex) {
 		}
-		catch(Exception ex)
-		{
-		}
-		
+
 	}
-
-
+	
+	//stops
 	public void suppress() {
-		stop = true;
-		//Robot.stop();
-		
+		Robot.stop();
 	}
 
-	@Override
-	public void stateChanged(SensorPort aSource, int aOldValue, int aNewValue) {
-		boolean currState = bump.isPressed();
-        if (currState != state) {
-           state = currState;
-           if (state){
-        	   try {
-				//Robot.move(-200);
-			} catch (Exception e) {
-				
-				e.printStackTrace();
-			}
-           }
-		
-	}
-	}
 }
